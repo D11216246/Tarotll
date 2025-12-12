@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔羅單張抽牌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .disclaimer {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .result-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .result-empty svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .result-card {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-name {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .card-meta span {
+            padding: 5px 15px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .orientation {
+            font-weight: 600;
+        }
+
+        .orientation.upright {
+            color: #28a745;
+        }
+
+        .orientation.reversed {
+            color: #dc3545;
+        }
+
+        .card-section {
+            margin-bottom: 20px;
+        }
+
+        .card-section h3 {
+            color: #667eea;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .keyword-tag {
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .meaning-text, .advice-text {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .question-display {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 8px;
+        }
+
+        .question-display strong {
+            color: #1976d2;
+        }
+
+        .question-display p {
+            margin-top: 5px;
+            color: #333;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌙 塔羅單張抽牌 🌙</h1>
+            <p>用於自我探索與反思提示</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="panel">
+                <h2>設定抽牌</h2>
+                
+                <div class="form-group">
+                    <label for="question">問題或主題（可留空）</label>
+                    <textarea 
+                        id="question" 
+                        placeholder="例如：關於工作的下一步、感情狀況、需要注意的事項..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="allowReversed">
+                        <label for="allowReversed">允許逆位牌（啟用時有 50% 機率出現逆位）</label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" id="drawBtn">🎴 抽一張牌</button>
+                    <button class="btn-secondary" id="clearBtn">🔄 清除</button>
+                </div>
+
+                <div class="disclaimer">
+                    <strong>⚠️ 使用須知</strong><br>
+                    本工具僅供自我探索與整理思緒使用，不構成醫療、法律、財務等專業建議。
+                    請勿以此作為重大決策的唯一依據。
+                </div>
+            </div>
+
+            <!-- Result Panel -->
+            <div class="panel">
+                <h2>抽牌結果</h2>
+                <div id="resultArea">
+                    <div class="result-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/>
+                            <line x1="12" y1="8" x2="12" y2="16"/>
+                            <line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                        <p>尚未抽牌，請點擊左側「抽一張牌」按鈕開始</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 塔羅單張抽牌 | 僅供自我探索使用</p>
+        </footer>
+    </div>
+
+    <script>
+        // Card Database - Simplified 8-card demo set
+        const TAROT_CARDS = [
+            {
+                id: "major-0",
+                name: "愚者",
+                arcana: "MAJOR",
+                suit: null,
+                keywords: ["新開始", "冒險", "純真", "自由"],
+                upright: {
+                    meaning: "愚者代表新的開始與無限可能。這是一段充滿冒險精神的旅程，鼓勵你以開放的心態面對未知。保持好奇心，不要被過去的經驗限制。",
+                    advice: "相信你的直覺，勇敢踏出第一步。即使前路未明，保持樂觀與彈性將帶領你找到屬於自己的道路。"
+                },
+                reversed: {
+                    meaning: "逆位的愚者提醒你注意過度冒險或缺乏計畫。可能在某些方面表現得過於輕率或不負責任，需要更謹慎地評估風險。",
+                    advice: "在行動前多做準備，聽取他人的建議。適度的謹慎不是膽怯，而是智慧的展現。"
+                }
+            },
+            {
+                id: "major-1",
+                name: "魔術師",
+                arcana: "MAJOR",
+                suit: null,
+                keywords: ["創造力", "技能", "意志力", "資源"],
+                upright: {
+                    meaning: "魔術師象徵你擁有所需的所有工具和能力來實現目標。這是展現才華與創造力的時刻，你的意志力和專注力將帶來成功。",
+                    advice: "運用你的技能和資源，將想法付諸行動。專注於目標，相信自己有能力創造想要的結果。"
+                },
+                reversed: {
+                    meaning: "逆位的魔術師可能表示技能未被充分利用，或是在操縱他人。也可能感到缺乏方向或自信，無法有效運用現有資源。",
+                    advice: "重新評估你的能力和資源。誠實面對自己的動機，避免自欺欺人或操縱他人的行為。"
+                }
+            },
+            {
+                id: "major-13",
+                name: "死神",
+                arcana: "MAJOR",
+                suit: null,
+                keywords: ["轉變", "結束", "重生", "放手"],
+                upright: {
+                    meaning: "死神代表重大的轉變與結束，但也象徵新生。某個階段、關係或狀況即將結束，為新的開始騰出空間。這是自然循環的一部分。",
+                    advice: "接受變化，放下不再服務你的事物。雖然告別可能帶來痛苦，但這是成長的必經之路。擁抱轉變，迎接新生。"
+                },
+                reversed: {
+                    meaning: "逆位的死神表示抗拒改變或延遲不可避免的結束。你可能緊抓著已經失去意義的事物，導致停滯不前。",
+                    advice: "認清什麼需要結束，勇敢面對改變。抗拒只會帶來更多痛苦，接受並順應自然流動才是明智之舉。"
+                }
+            },
+            {
+                id: "wands-ace",
+                name: "權杖王牌",
+                arcana: "MINOR",
+                suit: "WANDS",
+                keywords: ["創意靈感", "熱情", "新契機", "潛力"],
+                upright: {
+                    meaning: "權杖王牌帶來創意的火花與新的機會。這是開始新計劃或追求熱情的理想時機，充滿活力和動力。",
+                    advice: "抓住這個機會，讓你的熱情引導你前進。現在是展開新冒險、追求創意想法的最佳時刻。"
+                },
+                reversed: {
+                    meaning: "逆位的權杖王牌可能表示創意受阻、缺乏動力，或是機會尚未成熟。你可能感到猶豫不決或失去方向。",
+                    advice: "重新點燃你的熱情。思考是什麼阻礙了你的創意流動，並尋找方法突破這些障礙。耐心等待時機成熟。"
+                }
+            },
+            {
+                id: "cups-ace",
+                name: "聖杯王牌",
+                arcana: "MINOR",
+                suit: "CUPS",
+                keywords: ["愛", "情感", "直覺", "新關係"],
+                upright: {
+                    meaning: "聖杯王牌代表情感的豐盈與愛的新開始。這可能是新戀情、深化的友誼，或是與自己內心更深的連結。",
+                    advice: "敞開你的心，接受愛與情感的流動。傾聽你的直覺，讓感受引導你做出真誠的選擇。"
+                },
+                reversed: {
+                    meaning: "逆位的聖杯王牌可能表示情感受阻、失望或關係中的不和諧。你可能感到情感枯竭或難以表達真實感受。",
+                    advice: "檢視你的情感需求，誠實面對自己的感受。療癒過去的傷痛，才能再次敞開心扉。"
+                }
+            },
+            {
+                id: "swords-ace",
+                name: "寶劍王牌",
+                arcana: "MINOR",
+                suit: "SWORDS",
+                keywords: ["真理", "清晰", "突破", "決斷"],
+                upright: {
+                    meaning: "寶劍王牌帶來心智的清晰與真理的突破。這是一個認清事實、做出重要決定的時刻，思維敏銳而有力。",
+                    advice: "運用你的理性與邏輯，切穿迷霧看清真相。現在是做出困難但必要決定的時候，相信你的判斷力。"
+                },
+                reversed: {
+                    meaning: "逆位的寶劍王牌可能表示思維混亂、誤解或溝通不良。你可能面臨資訊不足或被錯誤觀念所困擾。",
+                    advice: "尋求更多資訊before做決定。避免衝動行事，給自己時間釐清思緒。注意溝通方式，確保訊息準確傳達。"
+                }
+            },
+            {
+                id: "pentacles-ace",
+                name: "錢幣王牌",
+                arcana: "MINOR",
+                suit: "PENTACLES",
+                keywords: ["機會", "繁榮", "安全", "實現"],
+                upright: {
+                    meaning: "錢幣王牌象徵物質層面的新機會與繁榮的開始。這可能是新工作、投資機會，或是帶來穩定和安全感的新開始。",
+                    advice: "把握這個實際的機會，腳踏實地地工作。建立穩固的基礎，長期的努力將帶來豐盛的回報。"
+                },
+                reversed: {
+                    meaning: "逆位的錢幣王牌可能表示機會流失、財務不穩定，或是過於物質主義。你可能忽略了實際面向的重要性。",
+                    advice: "重新評估你的財務狀況和目標。避免過度冒險，專注於建立穩固的基礎。記住，真正的豐盛不只是物質層面。"
+                }
+            },
+            {
+                id: "major-10",
+                name: "命運之輪",
+                arcana: "MAJOR",
+                suit: null,
+                keywords: ["命運", "轉折", "循環", "機遇"],
+                upright: {
+                    meaning: "命運之輪代表生命的循環與不可預測的轉折。情況正在改變，可能帶來好運和新機會。接受生命的起伏，順應自然節奏。",
+                    advice: "保持開放的心態面對變化。好運來臨時懂得感恩，逆境時保持信心。一切都在循環，沒有什麼是永恆不變的。"
+                },
+                reversed: {
+                    meaning: "逆位的命運之輪可能表示壞運氣、阻礙或抗拒改變。你可能感覺失去控制，事情沒有按計劃發展。",
+                    advice: "接受你無法控制的事物，專注於你能改變的部分。有時需要等待時機，保持耐心和彈性將幫助你度過難關。"
+                }
+            }
+        ];
+
+        // Utility function to escape HTML and prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Random integer between min and max (inclusive)
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Draw one card with optional reversed
+        function drawOneCard(cards, allowReversed) {
+            const randomIndex = randomInt(0, cards.length - 1);
+            const card = cards[randomIndex];
+            const isReversed = allowReversed && Math.random() < 0.5;
+            return { card, isReversed };
+        }
+
+        // Render the result
+        function renderResult(result, questionText) {
+            const { card, isReversed } = result;
+            const orientation = isReversed ? card.reversed : card.upright;
+            const orientationLabel = isReversed ? '逆位' : '正位';
+            const orientationClass = isReversed ? 'reversed' : 'upright';
+            
+            // Build arcana type display
+            let arcanaDisplay = card.arcana === 'MAJOR' ? '大阿爾克那' : '小阿爾克那';
+            if (card.suit) {
+                const suitNames = {
+                    'WANDS': '權杖',
+                    'CUPS': '聖杯',
+                    'SWORDS': '寶劍',
+                    'PENTACLES': '錢幣'
+                };
+                arcanaDisplay += ` - ${suitNames[card.suit]}`;
+            }
+
+            // Build keywords HTML
+            const keywordsHtml = card.keywords
+                .map(kw => `<span class="keyword-tag">${escapeHtml(kw)}</span>`)
+                .join('');
+
+            // Build question display (if provided)
+            const questionHtml = questionText.trim() 
+                ? `<div class="question-display">
+                    <strong>🔮 你的問題：</strong>
+                    <p>${escapeHtml(questionText)}</p>
+                   </div>`
+                : '';
+
+            const html = `
+                <div class="result-card">
+                    ${questionHtml}
+                    
+                    <div class="card-header">
+                        <div class="card-name">${escapeHtml(card.name)}</div>
+                        <div class="card-meta">
+                            <span>${escapeHtml(arcanaDisplay)}</span>
+                            <span class="orientation ${orientationClass}">${orientationLabel}</span>
+                        </div>
+                    </div>
+
+                    <div class="card-section">
+                        <h3>🔑 關鍵字</h3>
+                        <div class="keywords">
+                            ${keywordsHtml}
+                        </div>
+                    </div>
+
+                    <div class="card-section">
+                        <h3>📖 牌義</h3>
+                        <div class="meaning-text">${escapeHtml(orientation.meaning)}</div>
+                    </div>
+
+                    <div class="card-section">
+                        <h3>💡 建議</h3>
+                        <div class="advice-text">${escapeHtml(orientation.advice)}</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('resultArea').innerHTML = html;
+        }
+
+        // Clear and reset
+        function clearAll() {
+            document.getElementById('question').value = '';
+            document.getElementById('allowReversed').checked = false;
+            document.getElementById('resultArea').innerHTML = `
+                <div class="result-empty">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <p>尚未抽牌，請點擊左側「抽一張牌」按鈕開始</p>
+                </div>
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('drawBtn').addEventListener('click', () => {
+            const questionText = document.getElementById('question').value;
+            const allowReversed = document.getElementById('allowReversed').checked;
+            
+            const result = drawOneCard(TAROT_CARDS, allowReversed);
+            renderResult(result, questionText);
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', clearAll);
+    </script>
+</body>
+</html>
